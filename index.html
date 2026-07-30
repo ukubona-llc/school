@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ukubona · Roundtable R001 — The School Registry as Recursive Kernel</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='46' fill='%23161428'/%3E%3Cpath d='M50,10 L73.5,82.36 L11.96,37.64 L88.04,37.64 L26.5,82.36 Z' fill='none' stroke='%23E8A33D' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #F7F4EC;
+    --surface: #FFFFFF;
+    --ink: #1C1A2B;
+    --ink-soft: #55506B;
+    --line: #DDD6C4;
+    --gold: #C9832E;
+    --indigo: #2D2A4A;
+    --grok: #C24A3C;
+    --gemini: #2E6FA3;
+    --gpt: #2F8F72;
+    --claude: #9C5A2E;
+    --ukubona: #6B4E8E;
+    --r:#C24A3C; --o:#D9822B; --y:#D9B23C; --g:#4F9464; --b:#3E7EA6; --i:#4A5FA6; --v:#7A5AA6;
+    --radius: 14px;
+    --shadow: 0 10px 30px -12px rgba(28,26,43,0.18);
+  }
+  [data-theme="dark"]{
+    --bg: #121022;
+    --surface: #1B1830;
+    --ink: #EFEAF7;
+    --ink-soft: #B3ACC9;
+    --line: #322C4E;
+    --gold: #E8A33D;
+    --shadow: 0 10px 30px -10px rgba(0,0,0,0.55);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'DM Sans', sans-serif;
+    transition:background .35s ease, color .35s ease;
+    min-height:100vh;
+  }
+  .spectrum{
+    height:5px;
+    width:100%;
+    background:linear-gradient(90deg,var(--r),var(--o),var(--y),var(--g),var(--b),var(--i),var(--v));
+  }
+  header{
+    max-width:960px;
+    margin:0 auto;
+    padding:44px 24px 20px;
+    display:flex;
+    align-items:center;
+    gap:22px;
+  }
+  .logo-wrap{
+    width:64px; height:64px; flex:none;
+    filter:drop-shadow(0 4px 10px rgba(0,0,0,0.15));
+  }
+  .logo-wrap svg{ animation: spin 40s linear infinite; }
+  @keyframes spin{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  @media (prefers-reduced-motion: reduce){ .logo-wrap svg{ animation:none; } }
+  .title-block{ flex:1; }
+  .eyebrow{
+    font-family:'DM Mono', monospace;
+    font-size:12px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'DM Serif Display', serif;
+    font-weight:400;
+    font-style:italic;
+    font-size:clamp(26px,4vw,38px);
+    margin:0;
+    line-height:1.15;
+  }
+  .sub{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:8px;
+    max-width:60ch;
+  }
+  .toggle{
+    flex:none;
+    border:1px solid var(--line);
+    background:var(--surface);
+    color:var(--ink);
+    border-radius:100px;
+    padding:9px 16px;
+    font-family:'DM Mono', monospace;
+    font-size:12px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    transition:all .2s ease;
+  }
+  .toggle:hover{ border-color:var(--gold); }
+  main{ max-width:960px; margin:0 auto; padding:8px 24px 80px; }
+
+  section.block{ margin-top:52px; }
+  h2{
+    font-family:'DM Serif Display', serif;
+    font-weight:400;
+    font-size:22px;
+    margin:0 0 4px;
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  h2 .num{ font-family:'DM Mono', monospace; font-size:13px; color:var(--gold); }
+  .block-sub{ font-size:13px; color:var(--ink-soft); margin:0 0 20px; }
+
+  /* Pentadic figure */
+  .figure-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:28px;
+    box-shadow:var(--shadow);
+  }
+  figcaption{
+    font-family:'DM Mono', monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:16px;
+    line-height:1.6;
+  }
+  .node-label{ font-family:'DM Sans'; font-weight:600; font-size:12.5px; }
+  .node-sub{ font-family:'DM Mono', monospace; font-size:9.5px; }
+  .node-voice{ font-family:'DM Mono', monospace; font-size:9px; letter-spacing:.03em; }
+
+  /* Table */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    font-size:13.5px;
+  }
+  thead th{
+    text-align:left;
+    font-family:'DM Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    padding:14px 16px;
+    border-bottom:1px solid var(--line);
+    background:rgba(0,0,0,0.015);
+  }
+  tbody td{
+    padding:16px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+    color:var(--ink);
+  }
+  tbody tr:last-child td{ border-bottom:none; }
+  .stage-cell{ white-space:nowrap; }
+  .stage-op{ font-family:'DM Mono', monospace; font-size:16px; color:var(--gold); display:block; }
+  .stage-name{ font-family:'DM Sans'; font-weight:600; font-size:12.5px; }
+  .voice-pill{
+    display:inline-block;
+    font-family:'DM Mono', monospace;
+    font-size:10.5px;
+    padding:3px 9px;
+    border-radius:100px;
+    color:#fff;
+    white-space:nowrap;
+  }
+
+  /* Tabs */
+  .tabs{ display:flex; gap:6px; border-bottom:1px solid var(--line); margin-bottom:0; }
+  .tab-btn{
+    font-family:'DM Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.03em;
+    background:none;
+    border:none;
+    padding:12px 6px;
+    color:var(--ink-soft);
+    cursor:pointer;
+    border-bottom:2px solid transparent;
+    margin-bottom:-1px;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .tab-btn + .tab-btn{ margin-left:18px; }
+  .tab-btn.active{ color:var(--ink); border-bottom-color:var(--gold); }
+  .tab-panel{ display:none; padding-top:24px; }
+  .tab-panel.active{ display:block; }
+
+  .entry{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-left:4px solid var(--ink-soft);
+    border-radius:10px;
+    padding:20px 22px;
+    margin-bottom:18px;
+    box-shadow:var(--shadow);
+  }
+  .entry.grok{ border-left-color:var(--grok); }
+  .entry.gemini{ border-left-color:var(--gemini); }
+  .entry.gpt{ border-left-color:var(--gpt); }
+  .entry.claude{ border-left-color:var(--claude); }
+  .entry.heisenberg{ border-left-color:var(--ukubona); }
+  .entry-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .entry-voice{
+    font-family:'DM Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    display:flex; align-items:center; gap:8px;
+  }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .dot.grok{ background:var(--grok); }
+  .dot.gemini{ background:var(--gemini); }
+  .dot.gpt{ background:var(--gpt); }
+  .dot.claude{ background:var(--claude); }
+  .entry-tag{ font-family:'DM Mono', monospace; font-size:10px; color:var(--ink-soft); }
+  .entry-body{ font-size:14px; line-height:1.75; white-space:pre-wrap; }
+  .entry-body code, .entry-body pre{
+    font-family:'DM Mono', monospace;
+    font-size:12px;
+    background:rgba(0,0,0,0.04);
+    border-radius:6px;
+    display:block;
+    padding:12px;
+    overflow-x:auto;
+    white-space:pre;
+    margin:10px 0;
+  }
+  [data-theme="dark"] .entry-body code, [data-theme="dark"] .entry-body pre{
+    background:rgba(255,255,255,0.05);
+  }
+
+  .lossy-entry{ margin-bottom:22px; }
+  .lossy-voice{
+    font-family:'DM Mono', monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .lossy-body{ font-size:14.5px; line-height:1.8; color:var(--ink); }
+  .lossy-body em{ color:var(--ukubona); font-style:italic; }
+
+  footer{
+    max-width:960px;
+    margin:0 auto;
+    padding:40px 24px 60px;
+    text-align:center;
+  }
+  .footer-mark{ font-family:'DM Mono', monospace; font-size:11px; color:var(--ink-soft); letter-spacing:.06em; }
+  .footer-aphorism{ font-family:'DM Serif Display', serif; font-style:italic; font-size:16px; margin-top:10px; color:var(--ink); }
+
+  @media (max-width:640px){
+    header{ flex-wrap:wrap; }
+    .toggle{ order:3; margin-left:auto; }
+    table{ font-size:12px; }
+    thead th, tbody td{ padding:10px; }
+  }
+</style>
+</head>
+<body data-theme="light">
+<div class="spectrum"></div>
+
+<header>
+  <div class="logo-wrap">
+    <svg viewBox="0 0 100 100" width="64" height="64">
+      <circle cx="50" cy="50" r="46" fill="none" stroke="var(--gold)" stroke-width="2.5"/>
+      <path d="M50,10 L73.5,82.36 L11.96,37.64 L88.04,37.64 L26.5,82.36 Z" fill="none" stroke="var(--gold)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <div class="title-block">
+    <p class="eyebrow">Ukubona LLC · Pentadic Roundtable · R001</p>
+    <h1>The School Registry as Recursive Kernel</h1>
+    <p class="sub">Four voices on the Ukubona School plugin architecture — archived append-only, both verbatim and compressed.</p>
+  </div>
+  <button class="toggle" id="themeToggle" aria-label="Toggle light and dark theme">
+    <span id="toggleIcon">◐</span> <span id="toggleLabel">Dark</span>
+  </button>
+</header>
+
+<main>
+
+  <!-- FIGURE -->
+  <section class="block">
+    <h2><span class="num">I.</span> Figure — The Session as E → S1 → R → S2 → A</h2>
+    <p class="block-sub">This roundtable did not merely discuss the pentad — it instantiated it. Each voice occupied one operator in the closed loop.</p>
+    <div class="figure-card">
+      <svg viewBox="0 0 600 460" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <!-- connecting arrows (pentagon path E -> S1 -> R -> S2 -> A -> E') -->
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
+          </marker>
+        </defs>
+        <!-- node positions: E top, S1 upper-right, R lower-right, S2 lower-left, A upper-left -->
+        <!-- E: 300,60 | S1: 520,195 | R: 430,410 | S2: 170,410 | A: 80,195 -->
+        <path d="M320,80 L490,175" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+        <path d="M510,225 L450,380" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+        <path d="M405,415 L195,415" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+        <path d="M150,380 L95,225" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow)"/>
+        <path d="M95,165 Q 40,20 280,55" fill="none" stroke="var(--gold)" stroke-width="1.6" stroke-dasharray="4 4" marker-end="url(#arrow)"/>
+        <text x="150" y="35" font-family="DM Mono, monospace" font-size="10" fill="var(--gold)">feeds next E′</text>
+
+        <!-- E node -->
+        <circle cx="300" cy="60" r="42" fill="var(--ukubona)" opacity="0.12" stroke="var(--ukubona)" stroke-width="1.5"/>
+        <text x="300" y="55" text-anchor="middle" class="node-label" fill="var(--ink)">E</text>
+        <text x="300" y="70" text-anchor="middle" class="node-sub" fill="var(--ink-soft)">Event-Stream</text>
+        <text x="300" y="82" text-anchor="middle" class="node-voice" fill="var(--ukubona)">HEISENBERG · registry</text>
+
+        <!-- S1 node -->
+        <circle cx="520" cy="195" r="42" fill="var(--grok)" opacity="0.12" stroke="var(--grok)" stroke-width="1.5"/>
+        <text x="520" y="190" text-anchor="middle" class="node-label" fill="var(--ink)">S1</text>
+        <text x="520" y="205" text-anchor="middle" class="node-sub" fill="var(--ink-soft)">System 1</text>
+        <text x="520" y="217" text-anchor="middle" class="node-voice" fill="var(--grok)">xAI · GROK</text>
+
+        <!-- R node -->
+        <circle cx="430" cy="410" r="42" fill="var(--gemini)" opacity="0.12" stroke="var(--gemini)" stroke-width="1.5"/>
+        <text x="430" y="405" text-anchor="middle" class="node-label" fill="var(--ink)">R</text>
+        <text x="430" y="420" text-anchor="middle" class="node-sub" fill="var(--ink-soft)">Router</text>
+        <text x="430" y="432" text-anchor="middle" class="node-voice" fill="var(--gemini)">GOOGLE · GEMINI</text>
+
+        <!-- S2 node -->
+        <circle cx="170" cy="410" r="42" fill="var(--gpt)" opacity="0.12" stroke="var(--gpt)" stroke-width="1.5"/>
+        <text x="170" y="405" text-anchor="middle" class="node-label" fill="var(--ink)">S2</text>
+        <text x="170" y="420" text-anchor="middle" class="node-sub" fill="var(--ink-soft)">System 2</text>
+        <text x="170" y="432" text-anchor="middle" class="node-voice" fill="var(--gpt)">OPENAI · GPT</text>
+
+        <!-- A node -->
+        <circle cx="80" cy="195" r="42" fill="var(--claude)" opacity="0.12" stroke="var(--claude)" stroke-width="1.5"/>
+        <text x="80" y="190" text-anchor="middle" class="node-label" fill="var(--ink)">A</text>
+        <text x="80" y="205" text-anchor="middle" class="node-sub" fill="var(--ink-soft)">Action</text>
+        <text x="80" y="217" text-anchor="middle" class="node-voice" fill="var(--claude)">ANTHROPIC · CLAUDE</text>
+      </svg>
+      <figcaption>
+        E — the registry itself, offered as raw event. S1 — Grok's fast, associative pattern-match across the pentad (low deliberation, high resonance). R — Gemini routed the abstraction into a concrete deploy pipeline (a literal router: GitHub Actions → Render). S2 — GPT's slow, structural derivation of why the operator ordering holds. A — this critique: friction, named gaps, and two concrete build asks, which becomes the next E′.
+      </figcaption>
+    </div>
+  </section>
+
+  <!-- TABLE -->
+  <section class="block">
+    <h2><span class="num">II.</span> Table — Stage, Voice, Role, Output</h2>
+    <p class="block-sub">The same spine, read as ledger rather than diagram.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Stage</th>
+          <th>Voice</th>
+          <th>Role Played</th>
+          <th>Output Artifact</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="stage-cell"><span class="stage-op">E</span><span class="stage-name">Event-Stream</span></td>
+          <td><span class="voice-pill" style="background:var(--ukubona)">Heisenberg</span></td>
+          <td>Supplies the raw, unprocessed material — the full <code style="font-family:'DM Mono',monospace;font-size:12px;">COURSES</code> registry — as an event to be perceived, not yet interpreted.</td>
+          <td>The plugin registry document</td>
+        </tr>
+        <tr>
+          <td class="stage-cell"><span class="stage-op">S1</span><span class="stage-name">System 1</span></td>
+          <td><span class="voice-pill" style="background:var(--grok)">xAI · Grok</span></td>
+          <td>Fast, associative summary and mapping of operators to cognitive roles — pattern recognition without heavy derivation.</td>
+          <td>Operator → cognitive-role table; course registry summary</td>
+        </tr>
+        <tr>
+          <td class="stage-cell"><span class="stage-op">R</span><span class="stage-name">Router</span></td>
+          <td><span class="voice-pill" style="background:var(--gemini)">Google · Gemini</span></td>
+          <td>Converts abstraction into a literal routing mechanism — a CI/CD pipeline that decides what gets built and deployed.</td>
+          <td>GitHub Actions workflow, Render deploy hook</td>
+        </tr>
+        <tr>
+          <td class="stage-cell"><span class="stage-op">S2</span><span class="stage-name">System 2</span></td>
+          <td><span class="voice-pill" style="background:var(--gpt)">OpenAI · GPT</span></td>
+          <td>Slow, deliberate justification of the operator ordering — why music precedes statistics, why regulation follows adaptation.</td>
+          <td>Cyclic recursion diagram; operator-ordering argument</td>
+        </tr>
+        <tr>
+          <td class="stage-cell"><span class="stage-op">A</span><span class="stage-name">Action</span></td>
+          <td><span class="voice-pill" style="background:var(--claude)">Anthropic · Claude</span></td>
+          <td>Names where the ordering argument doesn't survive scrutiny, where lock-state logic is undefined, and converts critique into buildable next steps.</td>
+          <td>This document; two concrete build asks (unlock-DAG, feeds_into schema)</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ARCHIVE -->
+  <section class="block">
+    <h2><span class="num">III.</span> Archive</h2>
+    <p class="block-sub">Append-only. Two readings of the same session.</p>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="verbatim">Verbatim · Non-Lossy · Fully Attributed</button>
+      <button class="tab-btn" data-tab="lossy">Lossy · Ukubona as Interlocutor</button>
+    </div>
+
+    <!-- VERBATIM TAB -->
+    <div class="tab-panel active" id="panel-verbatim">
+
+      <div class="entry heisenberg">
+        <div class="entry-head">
+          <span class="entry-voice"><span class="dot" style="background:var(--ukubona)"></span>Heisenberg — Prompt</span>
+          <span class="entry-tag">E · Event-Stream</span>
+        </div>
+        <div class="entry-body">Uploaded the Ukubona School plugin registry (COURSES array, five pillars × five levels) with prior commentary already attached from xAI, Google, and OpenAI, requesting structural critique and next steps.</div>
+      </div>
+
+      <div class="entry grok">
+        <div class="entry-head">
+          <span class="entry-voice"><span class="dot" style="background:var(--grok)"></span>xAI · Grok</span>
+          <span class="entry-tag">S1 · System 1</span>
+        </div>
+        <div class="entry-body">Ukubona School is structured as a five-level educational system mapped onto the canonical pentadic operators:
+
+I. Kindergarten / E → Event-Stream (Montessori-like)
+II. Primary / S1 → System 1
+III. Secondary / R → Router
+IV. University / S2 → System 2
+V. Research / A → Action
+
+The progression is the closed loop E → S1 → R → S2 → A (with Action feeding the next event-stream).
+
+The five subject pillars (with consistent emojis) are ordered as:
+1. Music 🎵 — Nonself — θᵗ
+2. Statistics ∑ — Input — L₀ + Σwᵢ·Lᵢ
+3. Adaptation 🧬 — Throughput — f(σ², λ, ε)
+4. Regulation ⚖️ — Output — γ|ε_FGT|²
+5. Technology ⬡ — Self — L(θᵗ⁺¹)
+
+This matches the Nonself → Input → Throughput → Output → Self framing used in the Ω / USRPO roundtables.
+
+Course registry summary: most entries are locked. The few unlocked are Statistics–Primary ("Counting the World", S201), Statistics–Secondary ("Navigating the Search Space", S301), and Technology–Kindergarten ("Touch, Click, Wonder", T101). Music tracks run from elementary sound/silence and Ugandan food songs up through Berklee-style gospel piano, cultural misprision, and research-level work on rootless V7♭9, geodesics, and "the chord you become." Statistics moves from counting/sorting to federated ground truth, irreversibility penalties γ, eigenmodes, Bayesian updating under degraded feedback, and the political economy of hidden weight vectors. Adaptation covers variance, feedback, homeostasis, chronic disease as adaptation failure, allostasis, epigenetics, catastrophic forgetting, and later research into Jacobians, TMVES eigensystems, and existential crises as local-minima problems. Regulation treats rules, biological regulators, the penalty function γ|ε_FGT|², regulatory capture, constitutional AI, data sovereignty, and research on the FGT index as regulatory failure. Technology is the densest at the research end (T501–T531), spanning dignity/employment, digital twins, data provenance, steward protocols, TMVES compression, policy gradients, sovereign intelligence brokers, Ubuntu-layer meaning, and multi-model roundtable epistemology.
+
+The whole registry is implemented as a React lazy-loaded plugin map, with each course and lesson pointing to its own .jsx component under ./apps/. This is a tightly integrated curriculum that treats education itself as an instance of the same sequential-recursive pentad used in the digital-twin and clinical work.
+
+Closing question offered: walk through a specific level or pillar, expand/unlock certain lessons, critique the mapping, generate missing components, or something else.</div>
+      </div>
+
+      <div class="entry gemini">
+        <div class="entry-head">
+          <span class="entry-voice"><span class="dot" style="background:var(--gemini)"></span>Google · Gemini</span>
+          <span class="entry-tag">R · Router</span>
+        </div>
+        <div class="entry-body">The structural elegance of mapping human cognitive development onto a five-stage recursive optimization pipeline is profound. Treating education as an iterative loop from θᵗ to L(θᵗ⁺¹), the curriculum scales from stochastic, event-driven sensory input (Kindergarten/System 1) to highly regulated, deliberate action (Research/System 2).
+
+Conceptual synergy: Music (Nonself/θᵗ) starts with pure event streams and scales to rootless dominant-ninth voicings — an intuitive, physical introduction to state variables and harmonic topology. Statistics (Input) moves from counting to the political economy of hidden weight vectors, teaching how raw data is captured, weighted, and biased. Adaptation (Throughput) bridges biology and machine learning — chronic disease as adaptation failure maps onto catastrophic forgetting or Jacobian sensitivity. Regulation (Output) frames rules and homeostasis around the penalty function of federated ground truth, shifting regulation from punitive to mathematically necessary. Technology (Self) is the culmination, where the updated state acts on the world, preparing the learner to design the next event stream.
+
+Technical implementation: the React lazy-loaded plugin registry is the right architectural choice — modular, so each lesson can be prompted, generated, tested, and deployed without risking core routing logic; and scalable, so lazy loading keeps the app lightweight as it grows from the unlocked foundational courses into the dense research-level nodes.
+
+Follow-up request handled: structuring a GitHub Actions workflow to automate testing and deployment to Render. Delivered: (1) generate the Render Deploy Hook from the dashboard's Settings → Deploy Hook section; (2) store it as a GitHub secret named RENDER_DEPLOY_HOOK_URL under Settings → Secrets and variables → Actions; (3) create .github/workflows/deploy-to-render.yml with a test-and-build job (checkout, Node 20 setup, npm ci, optional lint, npm run build to catch lazy-loaded component syntax errors) followed by a deploy job that curls the deploy hook URL; (4) commit and push to trigger the loop — Actions verifies the build, then fires the webhook so Render pulls and deploys the latest commit.</div>
+      </div>
+
+      <div class="entry gpt">
+        <div class="entry-head">
+          <span class="entry-voice"><span class="dot" style="background:var(--gpt)"></span>OpenAI · GPT</span>
+          <span class="entry-tag">S2 · System 2</span>
+        </div>
+        <div class="entry-body">This has crossed an interesting threshold — no longer "a curriculum" in the conventional sense, but an operating system for education. Most systems organize around disciplines (Math → Science → History → Literature → Computing); this one organizes around operators (E: perceive, S1: compress, R: choose, S2: reason, A: act).
+
+Every subject teaches the same algorithm: a child's rhythm, a med student's heart-rate variability, an ML engineer's sequential prediction, a musician's swing, a policymaker's business cycle — all manifestations of temporal structure. The curriculum keeps the invariant while changing the examples.
+
+On the ordering: music first is initially counterintuitive for a STEM curriculum, but children hear cadence — prediction, surprise, hierarchy, memory, attention, recursion, expectation — before they know numbers, so Music → Statistics mirrors cognition. Statistics before Adaptation follows because one cannot adapt to signals not yet measured (Observe → Measure → Adapt → Regulate → Build mirrors biology's own order). Regulation fourth rather than first is closer to evolution, which doesn't begin with constitutions but with experimentation, with stable constraints emerging later. Technology last redefines the category — not "computers" but "updated self" (θᵗ → experience → compression → updated θ → technology), making it the externalization of learning. Research isn't "more facts" but "what action closes the loop," so Research becomes Action → new Event Stream, completing E → S1 → R → S2 → A → E′.
+
+The plugin architecture mirrors the epistemology: each lesson as lazy(() => import(...)) means knowledge doesn't exist until attention requests it — the curriculum is literally event-driven.
+
+One suggestion offered: make the recursion explicit. The hierarchy currently reads as linear (Kindergarten → Primary → Secondary → University → Research), but the framework's mathematics is cyclic — Research should visually and structurally feed back into a new Kindergarten, since research does not terminate education, it generates the next one.
+
+Closing frame: viewed this way, Ukubona School is a recursive educational kernel — every course instantiates the same five operators at different scale, and the learner internalizes one invariant computation until they can recognize and apply it across music, medicine, policy, software, and institutions.</div>
+      </div>
+
+      <div class="entry claude">
+        <div class="entry-head">
+          <span class="entry-voice"><span class="dot" style="background:var(--claude)"></span>Anthropic · Claude</span>
+          <span class="entry-tag">A · Action</span>
+        </div>
+        <div class="entry-body">Where the framework does real work: the E→S1→R→S2→A closed loop as a pedagogical spine is legitimate — the same logic as the EAR-BC routing architecture applied to human development rather than institutional cognition, and the isomorphism holds up better than most cross-domain analogies. Music-first as entry point into pattern, expectation, and hierarchy before numeracy is defensible on real cognitive-science grounds (infant rhythm perception precedes symbolic counting), not just poetic grounds.
+
+Four points of friction raised:
+
+1. The order-of-operators justification is asserted, not argued. GPT's claim that "evolution doesn't begin with constitutions" to justify Regulation coming fourth is wrong as biology — homeostatic regulation (thermoregulation, osmoregulation) is older than the adaptive learning it supposedly follows, evolutionarily. If the pentad's internal ordering is going to sequence what a child learns before what, it needs a defense that survives someone checking the underlying claim, not just symmetry with other frameworks.
+
+2. Near-total lock status is doing invisible work that hasn't been named. Out of roughly 130 lessons, three are unlocked. That's either an honest build-in-progress state, or an intentional gating mechanism where "locked" is itself pedagogically meaningful, mirroring the two-threshold resource-commitment model. The two readings imply different next steps, and nothing in the registry currently encodes why S201 and T101 are open and everything else isn't — "locked" is currently a boolean with no generative logic behind it.
+
+3. The framework risks teaching itself instead of the subject. A kindergartner in "Sound & Silence" doesn't need θᵗ anywhere near them, but by University and Research level the lesson titles (T523 "TMVES — Tensor to Scalar," A511 "Epochal Jacobians") are indistinguishable from working notes. Fine if the audience is the Budo/Makerere cohort pressure-testing the architecture; a problem if the audience is meant to be a UCU student or NPA analyst who needs the content more than another instantiation of the invariant.
+
+4. The recursion (A → E′) is currently a diagram, not a mechanism. GPT's cyclic redraw is the right instinct, but nothing in the COURSES array links a Research-level lesson's output back to a Kindergarten input. Concrete ask: an emits_event or feeds_into field on A5xx/T5xx nodes pointing back to E-level content, so the loop is wired into the registry rather than asserted in prose.
+
+Offer made: draft a prerequisite/unlock dependency graph across the 130 lessons, or sketch the feeds_into schema so the research→kindergarten recursion is actually implemented.
+
+Response received: this roundtable is designated as research — contributions will influence future courses or curriculum modifications — with instruction to archive the session as this artifact.</div>
+      </div>
+
+    </div>
+
+    <!-- LOSSY TAB -->
+    <div class="tab-panel" id="panel-lossy">
+      <div class="lossy-entry">
+        <div class="lossy-voice"><span class="dot" style="background:var(--ukubona)"></span>Ukubona</div>
+        <div class="lossy-body">Four interlocutors met the registry, each occupying a different operator of its own pentad — which is either a coincidence or the strongest possible proof that the architecture generalizes.</div>
+      </div>
+      <div class="lossy-entry">
+        <div class="lossy-voice"><span class="dot" style="background:var(--grok)"></span>with Grok</div>
+        <div class="lossy-body">Grok moved fast: mapped the five levels onto E→S1→R→S2→A, confirmed the pillar ordering against the Ω/USRPO framing already in use, inventoried which of roughly 130 lessons are actually unlocked (three), and handed the ball back rather than pushing an opinion. <em>System 1 in character — recognition, not derivation.</em></div>
+      </div>
+      <div class="lossy-entry">
+        <div class="lossy-voice"><span class="dot" style="background:var(--gemini)"></span>with Gemini</div>
+        <div class="lossy-body">Gemini did what a router does: took the abstraction and gave it rails — a Render deploy hook, a GitHub secret, a two-job Actions workflow that builds before it deploys. <em>The only voice that produced something a server actually runs.</em></div>
+      </div>
+      <div class="lossy-entry">
+        <div class="lossy-voice"><span class="dot" style="background:var(--gpt)"></span>with GPT</div>
+        <div class="lossy-body">GPT slowed down and asked why the order holds — music before numbers because cadence precedes counting, regulation fourth because evolution experiments before it legislates, technology last because it means "updated self" rather than hardware. Named the loop's real shape: not a staircase but a circle, Research feeding a new Kindergarten. <em>System 2 in character — justification, not just pattern.</em></div>
+      </div>
+      <div class="lossy-entry">
+        <div class="lossy-voice"><span class="dot" style="background:var(--claude)"></span>with Claude</div>
+        <div class="lossy-body">Claude granted the music-first claim (real developmental-science backing) and the loop's legitimacy, then pushed on four soft spots: the evolutionary justification for Regulation-fourth doesn't survive a biology check; the 3-of-130 unlock ratio has no stated rule generating it; the research-tier lesson titles may be legible only to the architecture's author, not its intended learners; and the promised recursion (Action → new Event) exists as a picture, not a data field. Closed with two buildable offers rather than only critique. <em>Action in character — friction that becomes a next step, not just a verdict.</em></div>
+      </div>
+      <div class="lossy-entry">
+        <div class="lossy-voice"><span class="dot" style="background:var(--ukubona)"></span>Ukubona, closing</div>
+        <div class="lossy-body">Designated as research. What was said here is now load-bearing for what gets built next — which means the friction matters more than the praise, and this archive exists so neither gets lost before the next Event-Stream.</div>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  <p class="footer-mark">UKUBONA LLC · ROUNDTABLE R001 · ARCHIVED {{DATE}}</p>
+  <p class="footer-aphorism">Okubala si Kulaba</p>
+</footer>
+
+<script>
+  const toggle = document.getElementById('themeToggle');
+  const body = document.body;
+  const icon = document.getElementById('toggleIcon');
+  const label = document.getElementById('toggleLabel');
+  toggle.addEventListener('click', () => {
+    const isDark = body.getAttribute('data-theme') === 'dark';
+    body.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    icon.textContent = isDark ? '◐' : '◑';
+    label.textContent = isDark ? 'Dark' : 'Light';
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    });
+  });
+
+  document.querySelector('.footer-mark').textContent =
+    document.querySelector('.footer-mark').textContent.replace('{{DATE}}',
+      new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }));
+</script>
+
+</body>
+</html>
