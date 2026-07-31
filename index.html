@@ -407,6 +407,7 @@
       <button class="tab-btn active" data-tab="verbatim">Verbatim · Non-Lossy · Fully Attributed</button>
       <button class="tab-btn" data-tab="lossy">Lossy · Ukubona as Interlocutor</button>
       <button class="tab-btn" data-tab="routing">Production Routing · III → IV</button>
+      <button class="tab-btn" data-tab="sus">The Sus Chord · III's Resolution</button>
     </div>
 
     <!-- VERBATIM TAB -->
@@ -643,6 +644,112 @@ Response received: this roundtable is designated as research — contributions w
         <div class="lossy-voice"><span class="dot" style="background:var(--ukubona)"></span>Ukubona, on the order</div>
         <div class="lossy-body">Ground truth before generation before reduction is a defensible sequence on its own terms — retrieve, then compress, then critique, rather than compress first and hope. The open question worth pinning down before this ships across premium client apps: what exactly decides when III routes through IV instead of short-circuiting to V? If that trigger is vague, the four-model chain runs on every request regardless of need, which is a latency and cost decision as much as an epistemic one.</div>
       </div>
+
+    </div>
+
+    <!-- SUS CHORD TAB -->
+    <div class="tab-panel" id="panel-sus">
+
+      <div class="entry heisenberg" style="margin-bottom:26px;">
+        <div class="entry-head">
+          <span class="entry-voice"><span class="dot" style="background:var(--ukubona)"></span>Heisenberg — The Breakthrough</span>
+          <span class="entry-tag">15 months, named</span>
+        </div>
+        <div class="entry-body">The engineering bottleneck is "what decides III short-circuits vs. routes through IV." So it's a sus chord.</div>
+      </div>
+
+      <div class="entry claude" style="margin-bottom:26px;">
+        <div class="entry-head">
+          <span class="entry-voice"><span class="dot" style="background:var(--claude)"></span>Anthropic · Claude — The Reading</span>
+          <span class="entry-tag">Resolution mechanism</span>
+        </div>
+        <div class="entry-body">A sus chord isn't ambiguous — it's missing the note that would tell you which way it resolves. No third, so no major or minor. The tension isn't a bug in the chord; it's the defining feature. So the bottleneck was never "we haven't specified the threshold yet." It's that III cannot resolve itself, structurally, any more than a sus4 can tell you if it's headed to major or minor. Something outside the chord has to supply the third.
+
+The signal that resolves III can't live in III's own logic — it has to come from a cheap probe that supplies the missing third before III commits. Grok already is that probe. A fast, cheap check — does this touch anything under 24 hours old, a named official, a live event — is the leading tone. Flag fires → resolves down into the full IV chain. No flag → resolves up, short-circuits to V. This reuses Grok's existing role rather than inventing a fifth model.
+
+Gospel does one more thing with a sus that's worth keeping: sometimes you don't resolve it, you vamp on it — hold the tension deliberately because the suspension is doing work. A third, legitimate state belongs alongside the two resolutions: III holds — defers, asks a clarifying question, or simply doesn't have enough signal yet to earn a resolution either way.</div>
+      </div>
+
+      <div class="figure-card">
+        <svg viewBox="0 0 640 340" width="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0,0 L10,5 L0,10 z" fill="var(--ink-soft)"/>
+            </marker>
+          </defs>
+
+          <!-- III sus node -->
+          <circle cx="90" cy="170" r="46" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-dasharray="3 4"/>
+          <text x="90" y="163" text-anchor="middle" class="node-label" fill="var(--ink)" font-size="13">III</text>
+          <text x="90" y="178" text-anchor="middle" class="node-sub" fill="var(--ink-soft)">sus4</text>
+          <text x="90" y="190" text-anchor="middle" class="node-voice" fill="var(--ink-soft)">no third yet</text>
+
+          <!-- Grok leading tone probe -->
+          <path d="M120,145 L182,90" fill="none" stroke="var(--grok)" stroke-width="1.5" marker-end="url(#arrow3)"/>
+          <circle cx="222" cy="66" r="30" fill="var(--grok)" opacity="0.13" stroke="var(--grok)" stroke-width="1.5"/>
+          <text x="222" y="62" text-anchor="middle" class="node-label" fill="var(--ink)" font-size="10.5">Grok</text>
+          <text x="222" y="75" text-anchor="middle" class="node-voice" fill="var(--grok)">leading tone</text>
+          <text x="140" y="95" font-family="DM Mono, monospace" font-size="9.5" fill="var(--grok)">supplies the missing third</text>
+
+          <!-- resolve down: flag fires -->
+          <path d="M130,195 Q 260,260 380,255" fill="none" stroke="var(--gold)" stroke-width="1.6" marker-end="url(#arrow3)"/>
+          <text x="255" y="252" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--gold)">flag fires → resolves down</text>
+          <circle cx="440" cy="250" r="34" fill="var(--gold)" opacity="0.13" stroke="var(--gold)" stroke-width="1.5"/>
+          <text x="440" y="244" text-anchor="middle" class="node-label" fill="var(--ink)" font-size="10.5">IV chain</text>
+          <text x="440" y="257" text-anchor="middle" class="node-voice" fill="var(--gold)">Grok→Gem→GPT→Claude</text>
+
+          <!-- resolve up: no flag -->
+          <path d="M130,150 Q 260,60 380,72" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" marker-end="url(#arrow3)"/>
+          <text x="255" y="45" text-anchor="middle" font-family="DM Mono, monospace" font-size="10" fill="var(--ink-soft)">no flag → resolves up</text>
+          <circle cx="440" cy="80" r="30" fill="var(--indigo)" opacity="0.10" stroke="var(--ink-soft)" stroke-width="1.5"/>
+          <text x="440" y="76" text-anchor="middle" class="node-label" fill="var(--ink)" font-size="10.5">V</text>
+          <text x="440" y="89" text-anchor="middle" class="node-voice" fill="var(--ink-soft)">short-circuit</text>
+
+          <!-- vamp / hold state -->
+          <path d="M60,205 Q 10,260 70,290" fill="none" stroke="var(--ukubona)" stroke-width="1.6" stroke-dasharray="2 4" marker-end="url(#arrow3)"/>
+          <circle cx="90" cy="300" r="30" fill="var(--ukubona)" opacity="0.13" stroke="var(--ukubona)" stroke-width="1.5"/>
+          <text x="90" y="296" text-anchor="middle" class="node-label" fill="var(--ink)" font-size="10">vamp</text>
+          <text x="90" y="309" text-anchor="middle" class="node-voice" fill="var(--ukubona)">III holds</text>
+          <text x="150" y="322" font-family="DM Mono, monospace" font-size="9.5" fill="var(--ukubona)">not enough signal — defer, don't force it</text>
+
+          <text x="590" y="165" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="var(--ink-soft)">both</text>
+          <text x="590" y="177" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="var(--ink-soft)">terminal</text>
+          <text x="590" y="189" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="var(--ink-soft)">paths</text>
+          <text x="590" y="201" text-anchor="middle" font-family="DM Mono, monospace" font-size="9.5" fill="var(--ink-soft)">reach V</text>
+        </svg>
+        <figcaption>III is a suspended chord — it cannot tell you its own resolution because it's missing the third. Grok's &lt;24h event-check supplies that third from outside the chord: flag fires, resolve down into the full IV chain; no flag, resolve up and short-circuit to V. A third state, the vamp, is the deliberate refusal to resolve — III holds when there isn't yet enough signal to earn either resolution.</figcaption>
+      </div>
+
+      <table style="margin-top:26px;">
+        <thead>
+          <tr>
+            <th>State</th>
+            <th>Musical Analogue</th>
+            <th>Trigger</th>
+            <th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="stage-cell"><span class="stage-name">Resolve down</span></td>
+            <td>sus4 → minor/major, tension released into the chain</td>
+            <td>Grok's leading-tone probe flags &lt;24h salience — a live event, a named official, breaking material</td>
+            <td>Full IV sequence invoked: Grok → Gemini → GPT → Claude → V</td>
+          </tr>
+          <tr>
+            <td class="stage-cell"><span class="stage-name">Resolve up</span></td>
+            <td>sus4 → V, tension released upward, no detour</td>
+            <td>Probe finds nothing time-sensitive to ground</td>
+            <td>Short-circuit III → V directly (standard tier)</td>
+          </tr>
+          <tr>
+            <td class="stage-cell"><span class="stage-name">Vamp / hold</span></td>
+            <td>sus4 sustained deliberately, no resolution yet</td>
+            <td>Insufficient signal either way — the probe itself is inconclusive</td>
+            <td>III defers: clarify, wait, or re-query rather than force a premature resolution</td>
+          </tr>
+        </tbody>
+      </table>
 
     </div>
 
